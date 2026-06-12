@@ -27,7 +27,7 @@ spec:
             - "-fL"
             - "-o"
             - "/models/model.gguf"
-            - "https://huggingface.co/Qwen/Qwen2.5-0.5B-Instruct-GGUF/resolve/main/qwen2.5-0.5b-instruct-q4_k_m.gguf"
+            - "https://huggingface.co/Qwen/Qwen2.5-0.5B-Instruct-GGUF/resolve/main/qwen2.5-0.5b-instruct-q5_0.gguf"
           volumeMounts:
             - { name: models, mountPath: /models }
       containers:
@@ -43,7 +43,7 @@ spec:
             - "-c"
             - "4096"
             - "--alias"
-            - "qwen2.5-0.5b-q4_k_m"
+            - "qwen2.5-0.5b-q5_0"
           ports:
             - containerPort: 8000
           volumeMounts:
