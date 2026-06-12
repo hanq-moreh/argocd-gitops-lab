@@ -13,3 +13,5 @@ spec:
     - number: 8000
   endpointPickerRef:
     name: qwen-epp               # the EPP Service that would score/pick endpoints
+    port:
+      number: 9002              # EPP gRPC ext-proc port (required by the v1 schema)
