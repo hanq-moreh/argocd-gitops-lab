@@ -1,0 +1,14 @@
+# Service with NO selector — it does not pick pods. It's a stable in-cluster
+# name/VIP whose backends are defined by the manual Endpoints below. This is how
+# you bring an out-of-cluster server (here: vLLM-ROCm on the host's MI250, run via
+# `docker run --device /dev/kfd …`) under a Kubernetes Service, GitOps-managed.
+apiVersion: v1
+kind: Service
+metadata:
+  name: gpu-vllm
+  namespace: serving
+spec:
+  ports:
+    - name: http
+      port: 8000
+      targetPort: 8001

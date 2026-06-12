@@ -1,0 +1,23 @@
+# Phase 5 follow-up — the documented fallback A: GPU inference runs in Docker
+# (where --device passthrough works), and Argo CD manages the in-cluster
+# Service + Endpoints that front it. The GPU model server is now under GitOps.
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: phase5-gpu-external
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/hanq-moreh/argocd-gitops-lab.git
+    targetRevision: main
+    path: manifests/phase5-gpu-external
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: serving
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true

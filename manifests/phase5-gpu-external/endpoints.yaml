@@ -1,0 +1,16 @@
+# Manual Endpoints — same name as the Service. Points the Service at the host's
+# kind-network gateway IP (172.18.0.1) on the published port 8001, where the
+# Docker vLLM-ROCm container serves the MI250. kube-proxy routes
+# gpu-vllm.serving.svc:8000  ->  172.18.0.1:8001  -> the GPU.
+# (172.18.0.1 = `docker network inspect kind` gateway = the host from a pod.)
+apiVersion: v1
+kind: Endpoints
+metadata:
+  name: gpu-vllm
+  namespace: serving
+subsets:
+  - addresses:
+      - ip: 172.18.0.1
+    ports:
+      - name: http
+        port: 8001
