@@ -1,0 +1,48 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: model-server
+  namespace: serving
+  labels:
+    app: model-server
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: model-server
+  template:
+    metadata:
+      labels:
+        app: model-server
+    spec:
+      containers:
+        - name: llama
+          image: ghcr.io/ggml-org/llama.cpp:server
+          # OpenAI-compatible server; pulls a tiny GGUF from HF on startup
+          args:
+            - "-hf"
+            - "ggml-org/Qwen2.5-0.5B-Instruct-GGUF"
+            - "--host"
+            - "0.0.0.0"
+            - "--port"
+            - "8000"
+            - "-c"
+            - "4096"
+            - "--alias"
+            - "qwen2.5-0.5b"
+          ports:
+            - containerPort: 8000
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8000
+            initialDelaySeconds: 10
+            periodSeconds: 5
+            failureThreshold: 90
+          resources:
+            requests:
+              cpu: 500m
+              memory: 1Gi
+            limits:
+              cpu: "4"
+              memory: 4Gi
