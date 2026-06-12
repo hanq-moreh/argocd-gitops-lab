@@ -1,0 +1,25 @@
+# wave 0 — install the Gateway API Inference Extension CRDs first.
+# ServerSideApply avoids the 256 KiB last-applied-configuration trap on big CRDs
+# (the exact failure we hit installing Argo CD itself in Phase 1).
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: phase4-gie-crds
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "0"
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/hanq-moreh/argocd-gitops-lab.git
+    targetRevision: main
+    path: manifests/phase4-llmd/crds
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: default
+  syncPolicy:
+    automated:
+      prune: false
+      selfHeal: true
+    syncOptions:
+      - ServerSideApply=true

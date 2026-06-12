@@ -1,0 +1,23 @@
+# app-of-apps: this single Application's only job is to create the child
+# Applications under apps/phase4-llmd/. Apply this one object and the whole
+# llm-d control-plane slice comes up in sync-wave order.
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: phase4-llmd-root
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/hanq-moreh/argocd-gitops-lab.git
+    targetRevision: main
+    path: apps/phase4-llmd
+    directory:
+      recurse: true
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: argocd
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true

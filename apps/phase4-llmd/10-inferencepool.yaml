@@ -1,0 +1,29 @@
+# wave 1 — the InferencePool CR. Depends on the CRDs from wave 0 existing.
+# The sync-wave makes the root create this AFTER the CRDs app; if the CRD isn't
+# registered yet on the first attempt, Argo CD retries until it converges.
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: phase4-inferencepool
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "1"
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/hanq-moreh/argocd-gitops-lab.git
+    targetRevision: main
+    path: manifests/phase4-llmd/pool
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: serving
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    retry:
+      limit: 5
+      backoff:
+        duration: 5s
+        factor: 2
+        maxDuration: 1m

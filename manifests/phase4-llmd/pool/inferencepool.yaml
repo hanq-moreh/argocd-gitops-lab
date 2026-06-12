@@ -1,0 +1,15 @@
+# GIE InferencePool — groups the model-server pods (from Phase 3) into an
+# inference-aware backend, and names the endpoint picker (EPP) that scores them.
+apiVersion: inference.networking.k8s.io/v1
+kind: InferencePool
+metadata:
+  name: qwen-pool
+  namespace: serving
+spec:
+  selector:
+    matchLabels:
+      app: model-server          # ← the Phase 3 model server pods
+  targetPorts:
+    - number: 8000
+  endpointPickerRef:
+    name: qwen-epp               # the EPP Service that would score/pick endpoints
