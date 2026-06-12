@@ -1,0 +1,40 @@
+# nginx shim — the in-cluster representation of the out-of-cluster GPU server.
+# It proxies to 172.18.0.1:8001 (the host, where `docker run --device /dev/kfd …`
+# serves vLLM-ROCm on the MI250). This is what lets Argo CD manage the link to an
+# external GPU process with normal, non-excluded resources.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: gpu-vllm-proxy
+  namespace: serving
+  labels:
+    app: gpu-vllm-proxy
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: gpu-vllm-proxy
+  template:
+    metadata:
+      labels:
+        app: gpu-vllm-proxy
+    spec:
+      volumes:
+        - name: conf
+          configMap:
+            name: gpu-vllm-proxy-conf
+      containers:
+        - name: proxy
+          image: nginx:1.27-alpine
+          ports:
+            - containerPort: 8000
+          volumeMounts:
+            - { name: conf, mountPath: /etc/nginx/nginx.conf, subPath: nginx.conf }
+          readinessProbe:
+            tcpSocket:
+              port: 8000
+            initialDelaySeconds: 3
+            periodSeconds: 5
+          resources:
+            requests: { cpu: 10m, memory: 16Mi }
+            limits: { cpu: 200m, memory: 64Mi }

@@ -1,14 +1,16 @@
-# Service with NO selector — it does not pick pods. It's a stable in-cluster
-# name/VIP whose backends are defined by the manual Endpoints below. This is how
-# you bring an out-of-cluster server (here: vLLM-ROCm on the host's MI250, run via
-# `docker run --device /dev/kfd …`) under a Kubernetes Service, GitOps-managed.
+# In-cluster Service for the GPU model server. It selects the proxy pods below,
+# which forward to the host's Docker vLLM-ROCm on the MI250. Argo CD manages the
+# Service + Deployment + ConfigMap (unlike a manual Endpoints, which Argo CD
+# excludes by default — see the Phase 5 follow-up write-up).
 apiVersion: v1
 kind: Service
 metadata:
   name: gpu-vllm
   namespace: serving
 spec:
+  selector:
+    app: gpu-vllm-proxy
   ports:
     - name: http
       port: 8000
-      targetPort: 8001
+      targetPort: 8000

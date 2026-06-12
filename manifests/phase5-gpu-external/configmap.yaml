@@ -1,0 +1,21 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: gpu-vllm-proxy-conf
+  namespace: serving
+data:
+  nginx.conf: |
+    worker_processes 1;
+    events { worker_connections 1024; }
+    http {
+      server {
+        listen 8000;
+        location / {
+          proxy_pass http://172.18.0.1:8001;   # host kind-gateway → Docker vLLM-ROCm (MI250)
+          proxy_http_version 1.1;
+          proxy_set_header Connection "";
+          proxy_read_timeout 300s;
+          proxy_buffering off;                  # stream tokens (SSE) straight through
+        }
+      }
+    }
