@@ -1,0 +1,26 @@
+# Bootstrap app-of-apps — the single object that rebuilds the whole lab.
+# It registers the three top-level Applications (it does NOT recurse into
+# apps/phase4-llmd/, which phase4-root owns). Apply this one file on a fresh
+# cluster and Argo CD repopulates everything from Git — the disaster-recovery
+# proof in Phase 6.
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: bootstrap
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/hanq-moreh/argocd-gitops-lab.git
+    targetRevision: main
+    path: apps
+    directory:
+      recurse: false
+      include: "{phase2-hello.yaml,phase3-model.yaml,phase4-root.yaml}"
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: argocd
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
